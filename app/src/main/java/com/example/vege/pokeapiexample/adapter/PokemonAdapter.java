@@ -7,6 +7,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,16 +18,19 @@ import com.example.vege.pokeapiexample.models.Pokemon;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonViewHolder> {
+public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonViewHolder> implements Filterable {
 
     private ArrayList<Pokemon> dataset;
+    private ArrayList<Pokemon> searchList;
     private Context context;
     private String spriteURL = "https://pokeres.bastionbot.org/images/pokemon/";
 
     public PokemonAdapter(Context context) {
         this.context = context;
         dataset = new ArrayList<>();
+        this.searchList = new ArrayList<>(dataset);
     }
 
     @NonNull
@@ -55,6 +60,43 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
     public int getItemCount() {
         return dataset.size();
     }
+
+    @Override
+    public Filter getFilter() {
+        return pokemonFilter;
+    }
+
+    private Filter pokemonFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Pokemon> filteredList = new ArrayList<>();
+
+            if (constraint == null || constraint.length() == 0) {
+                filteredList.addAll(searchList);
+
+            } else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+
+                for (Pokemon pokemon : searchList) {
+                    if (pokemon.getName().toLowerCase().contains(filterPattern));
+                    filteredList.add(pokemon);
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            dataset.clear();
+            dataset.addAll((List)results.values);
+            notifyDataSetChanged();
+
+        }
+    };
 
     public class PokemonViewHolder extends RecyclerView.ViewHolder {
 
