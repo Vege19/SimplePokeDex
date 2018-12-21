@@ -10,8 +10,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.vege.pokeapiexample.R;
 import com.example.vege.pokeapiexample.models.Pokemon;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -19,6 +21,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
 
     private ArrayList<Pokemon> dataset;
     private Context context;
+    private String spriteURL = "https://pokeres.bastionbot.org/images/pokemon/";
 
     public PokemonAdapter(Context context) {
         this.context = context;
@@ -37,6 +40,14 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         Pokemon p = dataset.get(i);
 
         pokemonViewHolder.pkmName.setText(p.getName());
+        pokemonViewHolder.pkmNumber.setText("#" + String.valueOf(p.getNumber()));
+
+        //getting image with picasso
+        Picasso.get()
+                .load(spriteURL + p.getNumber() + ".png")
+                .resize(500, 500)
+                .centerCrop()
+                .into(pokemonViewHolder.pkmSprite);
 
     }
 
@@ -50,6 +61,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         private CardView pkmItem;
         private ImageView pkmSprite;
         private TextView pkmName;
+        private TextView pkmNumber;
 
         public PokemonViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -57,6 +69,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
             pkmItem = itemView.findViewById(R.id.pkmItem);
             pkmName = itemView.findViewById(R.id.pkmName);
             pkmSprite = itemView.findViewById(R.id.pkmSprite);
+            pkmNumber = itemView.findViewById(R.id.pkmNumber);
         }
     }
 
