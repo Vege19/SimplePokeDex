@@ -1,6 +1,8 @@
 package com.example.vege.pokeapiexample;
 
+import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -32,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private PokemonAdapter mAdapter;
     private String URL = "http://pokeapi.co/api/v2/";
+    private ArrayList<Pokemon> pokemonList = new ArrayList<>();
+    private SwipeRefreshLayout swipeRefreshLayout;
     private Retrofit retrofit;
     private int offset;
     private boolean readyToLoad;
@@ -48,11 +52,11 @@ public class MainActivity extends AppCompatActivity {
 
         //recyclerview setup
         mRecyclerView = findViewById(R.id.pkmRecyclerView);
-        mAdapter = new PokemonAdapter(this);
-        mRecyclerView.setAdapter(mAdapter);
+        mAdapter = new PokemonAdapter(pokemonList,this);
         mRecyclerView.setHasFixedSize(true);
         final GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
         mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setAdapter(mAdapter);
 
         //to load more of 20 pokemon
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -90,6 +94,25 @@ public class MainActivity extends AppCompatActivity {
 
         //get data
         getData(offset);
+
+        //refresh layout
+        swipeRefreshLayout = findViewById(R.id.refreshPokemon);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                getData(offset);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
     }
 
     private void getData(int offset) {
@@ -103,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
 
                     PokemonRequest pokemonRequest = response.body();
-                    ArrayList<Pokemon> pokemonList = pokemonRequest.getResults();
+                    pokemonList = pokemonRequest.getResults();
 
                     mAdapter.addPokemonList(pokemonList);
 

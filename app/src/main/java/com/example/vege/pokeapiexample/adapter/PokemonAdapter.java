@@ -11,6 +11,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.vege.pokeapiexample.R;
@@ -22,15 +23,15 @@ import java.util.List;
 
 public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonViewHolder> implements Filterable {
 
-    private ArrayList<Pokemon> dataset;
-    private ArrayList<Pokemon> searchList;
+    private List<Pokemon> dataset;
+    private List<Pokemon> searchList;
     private Context context;
     private String spriteURL = "https://pokeres.bastionbot.org/images/pokemon/";
 
-    public PokemonAdapter(Context context) {
+    public PokemonAdapter(ArrayList<Pokemon> pokemonList, Context context) {
+        this.dataset = pokemonList;
+        searchList = new ArrayList<>(dataset);
         this.context = context;
-        dataset = new ArrayList<>();
-        this.searchList = new ArrayList<>(dataset);
     }
 
     @NonNull
@@ -42,10 +43,16 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
 
     @Override
     public void onBindViewHolder(@NonNull PokemonViewHolder pokemonViewHolder, int i) {
-        Pokemon p = dataset.get(i);
+        final Pokemon p = dataset.get(i);
 
         pokemonViewHolder.pkmName.setText(p.getName());
         pokemonViewHolder.pkmNumber.setText("#" + String.valueOf(p.getNumber()));
+        pokemonViewHolder.pkmItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, "#" + p.getNumber() + " " + p.getName(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         //getting image with picasso
         Picasso.get()
